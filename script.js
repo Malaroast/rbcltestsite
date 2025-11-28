@@ -3,10 +3,9 @@ const pitchersCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7qAaMm3tG
 
 // 원하는 칼럼을 A1:T1 헤더에서 골라 쓰도록 구성
 const COLUMN_CONFIG = {
-  playerName: "선수명",
+  playerName: "Player",
   table: {
     batters: [
-  "Player",
   "타석",
   "안타",
   "2루타",
@@ -27,7 +26,6 @@ const COLUMN_CONFIG = {
 ]
 ,
     pitchers: [
-  "Player",
   "출장 수",
   "선발등판 수",
   "이닝",
@@ -48,7 +46,6 @@ const COLUMN_CONFIG = {
   },
   detail: {
     batters: [
-  "Player",
   "타석",
   "안타",
   "2루타",
@@ -73,7 +70,6 @@ const COLUMN_CONFIG = {
 ]
 ,
   pitchers: [
-  "Player",
   "출장 수",
   "선발등판 수",
   "이닝",
@@ -113,7 +109,11 @@ function toObjects(raw) {
   const header = raw[0].slice(0, 20); // A1:T1
   const rows = raw
     .slice(1)
-    .filter((row) => (row[0] || "").trim() !== "") // A열(이름) 없는 행 제외
+    .filter((row) => {
+      const nameFilled = (row[0] || "").trim() !== ""; // A열 이름
+      const hasDataInAtoK = row.slice(0, 11).some((cell) => (cell || "").trim() !== "");
+      return nameFilled && hasDataInAtoK; // A~K 모두 비어 있으면 제외
+    })
     .map((row) => {
       const obj = {};
       header.forEach((key, idx) => {
