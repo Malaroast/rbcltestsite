@@ -30,7 +30,7 @@
       <section id="batters" class="tab-content active">
         <div class="section-head">
           <h2>타자 기록</h2>
-          <p>순위부터 타점까지 기본 스탣을 한눈에 확인하세요.</p>
+          <p>순위부터 타점까지 기본 스탯을 한눈에 확인하세요.</p>
         </div>
         <div class="table-card">
           <table id="battersTable">
@@ -43,7 +43,7 @@
       <section id="pitchers" class="tab-content">
         <div class="section-head">
           <h2>투수 기록</h2>
-          <p>ERA, WHIP 등 핵심 스탣을 정렬해 비교할 수 있습니다.</p>
+          <p>ERA, WHIP 등 핵심 스탯을 정렬해 비교할 수 있습니다.</p>
         </div>
         <div class="table-card">
           <table id="pitchersTable">
@@ -53,6 +53,25 @@
         </div>
       </section>
     </main>
+
+    <div id="playerModal" class="modal" aria-hidden="true">
+      <div class="modal__overlay"></div>
+      <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modalPlayerName">
+        <button class="modal__close" aria-label="닫기">×</button>
+        <div class="modal__header">
+          <p class="eyebrow">선수 상세</p>
+          <h3 id="modalPlayerName"></h3>
+        </div>
+        <div class="modal__tabs">
+          <button class="tab-btn active" data-detail-tab="detailBatters">타자</button>
+          <button class="tab-btn" data-detail-tab="detailPitchers">투수</button>
+        </div>
+        <div class="modal__content">
+          <div id="detailBatters" class="detail-content active"></div>
+          <div id="detailPitchers" class="detail-content"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="script.js"></script>
