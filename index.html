@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBCL 기록 뷰어</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero__text">
+        <p class="eyebrow">리그 리더보드</p>
+        <h1>타자 / 투수 기록</h1>
+        <p class="sub">카테고리를 누르면 기본 기록 표가 바뀌고, 헤더를 클릭해 정렬할 수 있습니다.</p>
+      </div>
+      <div class="controls">
+        <div class="tabs" aria-label="카테고리 선택">
+          <button class="tab-btn active" data-tab="batters">타자 기록</button>
+          <button class="tab-btn" data-tab="pitchers">투수 기록</button>
+        </div>
+        <label class="search" for="searchInput">
+          <span>선수 검색</span>
+          <input type="text" id="searchInput" placeholder="이름, 팀명으로 검색" autocomplete="off">
+        </label>
+      </div>
+    </header>
+
+    <main>
+      <section id="batters" class="tab-content active">
+        <div class="section-head">
+          <h2>타자 기록</h2>
+          <p>순위부터 타점까지 기본 스탣을 한눈에 확인하세요.</p>
+        </div>
+        <div class="table-card">
+          <table id="battersTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="pitchers" class="tab-content">
+        <div class="section-head">
+          <h2>투수 기록</h2>
+          <p>ERA, WHIP 등 핵심 스탣을 정렬해 비교할 수 있습니다.</p>
+        </div>
+        <div class="table-card">
+          <table id="pitchersTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
