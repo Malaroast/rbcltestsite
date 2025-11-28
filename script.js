@@ -6,90 +6,91 @@ const COLUMN_CONFIG = {
   playerName: "Player",
   table: {
     batters: [
-  "타석",
-  "안타",
-  "2루타",
-  "3루타",
-  "홈런",
-  "볼넷",
-  "삼진",
-  "도루",
-  "타점",
-  "득점",
-  "타율",
-  "출루율",
-  "장타율",
-  "OPS",
-  "wRC+",
-  "소속 팀",
-  "hWAR"
-]
-,
+      "Player",
+      "타석",
+      "안타",
+      "2루타",
+      "3루타",
+      "홈런",
+      "볼넷",
+      "삼진",
+      "도루",
+      "타점",
+      "득점",
+      "타율",
+      "출루율",
+      "장타율",
+      "OPS",
+      "wRC+",
+      "소속 팀",
+      "hWAR"
+    ],
     pitchers: [
-  "출장 수",
-  "선발등판 수",
-  "이닝",
-  "자책점",
-  "탈삼진",
-  "피안타",
-  "피홈런",
-  "볼넷",
-  "승리",
-  "패배",
-  "세이브",
-  "ERA",
-  "WHIP",
-  "pWAR",
-  "소속 팀"
-]
-
+      "Player",
+      "출장 수",
+      "선발등판 수",
+      "이닝",
+      "자책점",
+      "탈삼진",
+      "피안타",
+      "피홈런",
+      "볼넷",
+      "승리",
+      "패배",
+      "세이브",
+      "ERA",
+      "WHIP",
+      "pWAR",
+      "소속 팀"
+    ]
   },
   detail: {
     batters: [
-  "타석",
-  "안타",
-  "2루타",
-  "3루타",
-  "홈런",
-  "볼넷",
-  "삼진",
-  "도루",
-  "타점",
-  "득점",
-  "타율",
-  "출루율",
-  "장타율",
-  "OPS",
-  "wOBA",
-  "wRC",
-  "wRC+",
-  "소속 팀",
-  "wRAA",
-  "hWAR",
-  "FA 등급"
-]
-,
-  pitchers: [
-  "출장 수",
-  "선발등판 수",
-  "이닝",
-  "자책점",
-  "탈삼진",
-  "피안타",
-  "피홈런",
-  "볼넷",
-  "승리",
-  "패배",
-  "세이브",
-  "ERA",
-  "WHIP",
-  "ERA+",
-  "pWAR",
-  "소속 팀",
-  "FIP",
-  "FA 등급",
-  "RAA"
-]
+      "Player",
+      "타석",
+      "안타",
+      "2루타",
+      "3루타",
+      "홈런",
+      "볼넷",
+      "삼진",
+      "도루",
+      "타점",
+      "득점",
+      "타율",
+      "출루율",
+      "장타율",
+      "OPS",
+      "wOBA",
+      "wRC",
+      "wRC+",
+      "소속 팀",
+      "wRAA",
+      "hWAR",
+      "FA 등급"
+    ],
+    pitchers: [
+      "Player",
+      "출장 수",
+      "선발등판 수",
+      "이닝",
+      "자책점",
+      "탈삼진",
+      "피안타",
+      "피홈런",
+      "볼넷",
+      "승리",
+      "패배",
+      "세이브",
+      "ERA",
+      "WHIP",
+      "ERA+",
+      "pWAR",
+      "소속 팀",
+      "FIP",
+      "FA 등급",
+      "RAA"
+    ]
   }
 };
 
@@ -106,7 +107,7 @@ function parseCSV(text) {
 
 function toObjects(raw) {
   if (!raw.length) return { header: [], rows: [] };
-  const header = raw[0].slice(0, 20); // A1:T1
+  const header = raw[0]; // 전체 헤더 사용 (필요한 것만 COLUMN_CONFIG로 선택)
   const rows = raw
     .slice(1)
     .filter((row) => row.slice(0, 11).some((cell) => (cell || "").trim() !== "")) // A~K가 모두 비면 제외
@@ -132,14 +133,14 @@ function mapByName(rows) {
 function zeroRow(columns, name) {
   const obj = {};
   columns.forEach((col) => {
-    obj[col] = "0";
+    obj[col] = "";
   });
   if (name) obj[COLUMN_CONFIG.playerName] = name;
   return obj;
 }
 
 function pick(row, columns) {
-  return columns.map((col) => row?.[col] ?? "0");
+  return columns.map((col) => row?.[col] ?? "");
 }
 
 function renderTable(category, tableId, columns, rows) {
