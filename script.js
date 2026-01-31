@@ -68,6 +68,14 @@ function getNumericColumns(tab) {
 function populateFilterOptions(tab) {
   const select = document.getElementById("filterColumn");
   if (!select) return;
+    if (tab === 'top5') {
+    const filtersDiv = document.querySelector('.filters');
+    if (filtersDiv) filtersDiv.style.display = 'none'; // 필터 UI 숨기기
+    return;
+  } else {
+    const filtersDiv = document.querySelector('.filters');
+    if (filtersDiv) filtersDiv.style.display = 'flex'; // 타자/투수 탭에선 다시 보이기
+  }
   select.innerHTML = "";
   const emptyOpt = document.createElement("option");
   emptyOpt.value = ""; emptyOpt.textContent = "전체"; select.appendChild(emptyOpt);
@@ -77,14 +85,6 @@ function populateFilterOptions(tab) {
   const state = filters[tab]; select.value = state.col || "";
   document.getElementById("filterMin").value = state.min ?? "";
   document.getElementById("filterMax").value = state.max ?? "";
-  if (tab === 'top5') {
-    const filtersDiv = document.querySelector('.filters');
-    if (filtersDiv) filtersDiv.style.display = 'none'; // 필터 UI 숨기기
-    return;
-  } else {
-    const filtersDiv = document.querySelector('.filters');
-    if (filtersDiv) filtersDiv.style.display = 'flex'; // 타자/투수 탭에선 다시 보이기
-  }
 }
 
 // --- 수정된 부분: 순위 업데이트 로직 ---
@@ -295,10 +295,18 @@ document.getElementById("clearFilter").addEventListener("click", () => {
 });
 document.querySelectorAll(".tab-btn[data-tab]").forEach((btn) => {
   btn.addEventListener("click", () => {
+    const tabName = btn.dataset.tab; // 추가
     document.querySelectorAll(".tab-btn[data-tab]").forEach((b) => b.classList.remove("active"));
     document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
-    btn.classList.add("active"); document.getElementById(btn.dataset.tab).classList.add("active");
-    populateFilterOptions(btn.dataset.tab); applyAllFilters();
+    
+    btn.classList.add("active"); 
+    document.getElementById(tabName).classList.add("active");
+    
+    // 수정된 부분: top5가 아닐 때만 필터와 정렬을 수행
+    populateFilterOptions(tabName); 
+    if (tabName !== 'top5') {
+      applyAllFilters();
+    }
   });
 });
 
