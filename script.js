@@ -1,5 +1,6 @@
 const battersCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7qAaMm3tG_1oEuIPbn4pLZiDzzwl6d-Ur-y3_fw9fXIjJN-SYwdap5rbmOk63nDApmzCiqYYa495j/pub?gid=0&single=true&output=csv";
 const pitchersCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7qAaMm3tG_1oEuIPbn4pLZiDzzwl6d-Ur-y3_fw9fXIjJN-SYwdap5rbmOk63nDApmzCiqYYa495j/pub?gid=249730824&single=true&output=csv";
+const leagueCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7qAaMm3tG_1oEuIPbn4pLZiDzzwl6d-Ur-y3_fw9fXIjJN-SYwdap5rbmOk63nDApmzCiqYYa495j/pub?gid=776680138&single=true&output=csv";
 
 const COLUMN_CONFIG = {
   playerName: "Player",
@@ -308,6 +309,70 @@ async function loadData() {
     renderTable("batters", "battersTable", COLUMN_CONFIG.table.batters, []);
     renderTable("pitchers", "pitchersTable", COLUMN_CONFIG.table.pitchers, []);
   }
+}
+
+async function loadData() {
+  try {
+    const [bRes, pRes, lRes] = await Promise.all([
+      fetch(battersCSV), 
+      fetch(pitchersCSV),
+      fetch(leagueCSV) // 추가
+    ]);
+    
+    const bData = toObjects(parseCSV(await bRes.text()));
+    const pData = toObjects(parseCSV(await pRes.text()));
+    const lRaw = parseCSV(await lRes.text()); // 추가
+
+    dataStore.batters = { ...bData, map: mapByName(bData.rows) };
+    dataStore.pitchers = { ...pData, map: mapByName(pData.rows) };
+    
+    // 리더보드 실행 함수 추가
+    renderTop5(lRaw); 
+
+    renderTable("batters", "battersTable", COLUMN_CONFIG.table.batters, dataStore.batters.rows);
+    renderTable("pitchers", "pitchersTable", COLUMN_CONFIG.table.pitchers, dataStore.pitchers.rows);
+    setupTableClick();
+    populateFilterOptions(getActiveTab());
+    applyAllFilters();
+  } catch (err) {
+    console.error("데이터 로드 에러:", err);
+  }
+}
+
+// 3. 파일 맨 아래에 renderTop5 함수 추가
+function renderTop5(raw) {
+  const container = document.getElementById("leaderContainer");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const colPairs = [1, 4, 7, 10, 13]; // B, E, H, K, N열
+  const rowGroups = [{start: 44, titleRow: 44}, {start: 51, titleRow: 51}]; 
+
+  rowGroups.forEach(group => {
+    colPairs.forEach(colIdx => {
+      const title = raw[group.titleRow]?.[colIdx + 1];
+      if (!title) return;
+      
+      let listHtml = "";
+      for (let i = 1; i <= 5; i++) {
+        const name = raw[group.start + i]?.[colIdx];
+        const val = raw[group.start + i]?.[colIdx + 1];
+        if (name) {
+          listHtml += `
+            <li class="leader-item">
+              <span class="leader-rank">${i}</span>
+              <span class="leader-name" onclick="openModal('${name}')">${name}</span>
+              <span class="leader-value">${val}</span>
+            </li>`;
+        }
+      }
+      container.innerHTML += `
+        <div class="leader-card">
+          <h3>${title}</h3>
+          <ul class="leader-list">${listHtml}</ul>
+        </div>`;
+    });
+  });
 }
 
 setupModalEvents();
