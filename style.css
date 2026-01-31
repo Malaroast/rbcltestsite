@@ -299,6 +299,41 @@ th.sort-desc::after { content:" v"; font-size:10px; }
   color:var(--ink);
 }
 
+/* 리더보드 그리드 및 카드 디자인 추가 */
+.leader-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+.leader-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  text-align: center;
+}
+.leader-card h3 {
+  font-size: 18px;
+  color: var(--accent);
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent-soft);
+}
+.leader-list { list-style: none; padding: 0; margin: 0; }
+.leader-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 14px;
+}
+.leader-item:last-child { border-bottom: none; }
+.leader-rank { font-weight: 800; color: var(--muted); }
+.leader-name { flex-grow: 1; text-align: left; padding-left: 10px; font-weight: 600; cursor: pointer; color: var(--accent); }
+.leader-value { font-weight: 700; color: var(--ink); }
+
 .tab-content { display:none; }
 .tab-content.active { display:block; }
 
