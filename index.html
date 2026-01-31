@@ -11,31 +11,45 @@
     <header class="hero">
       <div class="hero__text">
         <p class="eyebrow">RBCL 리그 스탯 리더보드</p>
-        <h1>RBCL 기록실</h1>
-        <p class="sub">부문별 리더와 전체 기록을 확인하세요. 이름을 클릭하면 상세 정보가 나타납니다.</p>
+        <h1>타자 / 투수 기록</h1>
+        <p class="sub">카테고리를 누르면 투수와 타자의 기록을 바꿔서 확인할 수 있고, 헤더를 클릭해 정렬할 수 있습니다.</p>
       </div>
       <div class="controls">
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="top5">Top 5 리더보드</button>
-          <button class="tab-btn" data-tab="batters">타자 기록</button>
+        <div class="tabs" aria-label="카테고리 선택">
+          <button class="tab-btn active" data-tab="batters">타자 기록</button>
           <button class="tab-btn" data-tab="pitchers">투수 기록</button>
         </div>
         <label class="search" for="searchInput">
           <span>선수 검색</span>
-          <input type="text" id="searchInput" placeholder="이름, 팀명 검색" autocomplete="off">
+          <input type="text" id="searchInput" placeholder="이름, 팀명으로 검색" autocomplete="off">
         </label>
       </div>
     </header>
 
     <main>
-      <section id="top5" class="tab-content active">
-        <div class="section-head">
-          <h2>시즌 부문별 리더</h2>
+      <div class="filters" aria-label="숫자 필터">
+        <div class="filter-group">
+          <label for="filterColumn">지표</label>
+          <select id="filterColumn"></select>
         </div>
-        <div class="leader-grid" id="leaderContainer"></div>
-      </section>
-
-      <section id="batters" class="tab-content">
+        <div class="filter-group">
+          <label for="filterMin">이상</label>
+          <input type="number" id="filterMin" placeholder="min">
+        </div>
+        <div class="filter-group">
+          <label for="filterMax">이하</label>
+          <input type="number" id="filterMax" placeholder="max">
+        </div>
+        <div class="filter-actions">
+          <button id="applyFilter" class="btn">필터 적용</button>
+          <button id="clearFilter" class="btn ghost">초기화</button>
+        </div>
+      </div>
+      <section id="batters" class="tab-content active">
+        <div class="section-head">
+          <h2>타자 기록</h2>
+          <p>순위부터 타점까지 기본 스탯을 한눈에 확인하세요.</p>
+        </div>
         <div class="table-card">
           <table id="battersTable">
             <thead></thead>
@@ -45,6 +59,10 @@
       </section>
 
       <section id="pitchers" class="tab-content">
+        <div class="section-head">
+          <h2>투수 기록</h2>
+          <p>ERA, WHIP 등 핵심 스탯을 정렬해 비교할 수 있습니다.</p>
+        </div>
         <div class="table-card">
           <table id="pitchersTable">
             <thead></thead>
@@ -54,21 +72,26 @@
       </section>
     </main>
 
-    <div id="playerModal" class="modal">
+    <div id="playerModal" class="modal" aria-hidden="true">
       <div class="modal__overlay"></div>
-      <div class="modal__dialog">
-        <button class="modal__close">×</button>
+      <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modalPlayerName">
+        <button class="modal__close" aria-label="닫기">×</button>
         <div class="modal__header">
+          <p class="eyebrow">선수 상세</p>
           <h3 id="modalPlayerName"></h3>
         </div>
+        <div class="modal__tabs">
+          <button class="tab-btn active" data-detail-tab="detailBatters">타자</button>
+          <button class="tab-btn" data-detail-tab="detailPitchers">투수</button>
+        </div>
         <div class="modal__content">
-          <div id="detailBatters"></div>
-          <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
-          <div id="detailPitchers"></div>
+          <div id="detailBatters" class="detail-content active"></div>
+          <div id="detailPitchers" class="detail-content"></div>
         </div>
       </div>
     </div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
