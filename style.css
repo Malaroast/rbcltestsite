@@ -405,4 +405,3 @@ th.sort-desc::after { content:" v"; font-size:10px; }
 
 @media (max-width: 500px) {
   .leader-grid { grid-template-columns: 1fr; } /* 모바일은 1개 */
-}
