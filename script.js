@@ -194,6 +194,7 @@ function sortTable(tableId, col) {
 
 function applyAllFilters() {
   const activeTab = getActiveTab();
+  if (tab === 'top5') return;
   const searchText = document.getElementById("searchInput").value.toLowerCase();
   const filter = filters[activeTab];
   const table = document.querySelector(`#${activeTab} table`);
@@ -312,16 +313,45 @@ document.querySelectorAll(".tab-btn[data-tab]").forEach((btn) => {
 
 async function loadData() {
   try {
-    const [bRes, pRes] = await Promise.all([fetch(battersCSV), fetch(pitchersCSV)]);
-    const bData = toObjects(parseCSV(await bRes.text()));
-    const pData = toObjects(parseCSV(await pRes.text()));
+    // 1. 세 개의 시트(타자, 투수, 리그) 데이터를 동시에 가져옵니다.
+    const [bRes, pRes, lRes] = await Promise.all([
+      fetch(battersCSV), 
+      fetch(pitchersCSV),
+      fetch(leagueCSV) // 리더보드용 시트 추가
+    ]);
+
+    // 2. 각 데이터를 텍스트로 변환 및 객체화
+    const bText = await bRes.text();
+    const pText = await pRes.text();
+    const lText = await lRes.text();
+
+    const bData = toObjects(parseCSV(bText));
+    const pData = toObjects(parseCSV(pText));
+    const lRaw = parseCSV(lText); // 리더보드는 원본 배열 형태 그대로 사용
+
+    // 3. 데이터 저장
     dataStore.batters = { ...bData, map: mapByName(bData.rows) };
     dataStore.pitchers = { ...pData, map: mapByName(pData.rows) };
+
+    // 4. 화면 렌더링 (리더보드 및 테이블)
+    renderTop5(lRaw); // 리더보드 생성 함수 실행
     renderTable("batters", "battersTable", COLUMN_CONFIG.table.batters, dataStore.batters.rows);
     renderTable("pitchers", "pitchersTable", COLUMN_CONFIG.table.pitchers, dataStore.pitchers.rows);
-    setupTableClick(); populateFilterOptions(getActiveTab()); applyAllFilters();
+
+    // 5. 초기 설정 및 필터 적용
+    setupTableClick(); 
+    
+    const currentTab = getActiveTab();
+    populateFilterOptions(currentTab); 
+
+    // 현재 탭이 리더보드(top5)가 아닐 때만 필터 로직을 실행하여 에러를 방지합니다.
+    if (currentTab !== 'top5') {
+      applyAllFilters();
+    }
+
   } catch (err) {
-    console.error("데이터 오류", err);
+    console.error("데이터 로드 중 오류 발생:", err);
+    // 오류 시 빈 테이블이라도 출력하여 화면 깨짐 방지
     renderTable("batters", "battersTable", COLUMN_CONFIG.table.batters, []);
     renderTable("pitchers", "pitchersTable", COLUMN_CONFIG.table.pitchers, []);
   }
