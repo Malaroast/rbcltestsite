@@ -288,36 +288,35 @@ function setupTableClick() {
   });
 }
 
-// 3. 파일 맨 아래에 있는 renderTop5 함수를 이 코드로 덮어쓰세요.
-function renderTop5(raw) {
+async function renderTop5(raw) {
   const container = document.getElementById("leaderContainer");
   if (!container) return;
   container.innerHTML = "";
 
-  // B, E, H, K, N열 (선수 이름이 있는 열 인덱스)
   const colPairs = [1, 4, 7, 10, 13]; 
+  const rowGroups = [{start: 44, titleRow: 44}, {start: 51, titleRow: 51}]; 
 
-  // 사진 분석 결과: 
-  // 타자 섹션: 제목 45행(인덱스 44), 데이터 시작 46행(44+1)
-  // 투수 섹션: 제목 52행(인덱스 51), 데이터 시작 53행(51+1)
-  const rowGroups = [
-    {start: 44, titleRow: 44}, // 타자 부문 (B45, E45 등 제목 행)
-    {start: 51, titleRow: 51}  // 투수 부문 (B52, E52 등 제목 행)
-  ]; 
-
-  rowGroups.forEach(group => {
-    colPairs.forEach(colIdx => {
-      // 제목 가져오기 (이름 옆 칸: 타율, 홈런, wRC+ 등)
+  for (const group of rowGroups) {
+    for (const colIdx of colPairs) {
       const title = raw[group.titleRow]?.[colIdx + 1];
-      if (!title) return;
+      if (!title) continue;
       
       let listHtml = "";
-      // 각 부문당 1위부터 5위까지 가져오기
+      let topPlayerImage = ""; // 1등 사진 저장용
+
       for (let i = 1; i <= 5; i++) {
-        const name = raw[group.start + i]?.[colIdx];     // 선수 이름
-        const val = raw[group.start + i]?.[colIdx + 1];  // 기록 값
+        const name = raw[group.start + i]?.[colIdx];
+        const val = raw[group.start + i]?.[colIdx + 1];
         
         if (name && name.trim() !== "") {
+          // 1등인 경우 로블록스 사진 가져오기
+          if (i === 1) {
+            const avatarUrl = await getRobloxAvatar(name);
+            if (avatarUrl) {
+              topPlayerImage = `<div class="top-player-img"><img src="${avatarUrl}" alt="${name}"></div>`;
+            }
+          }
+
           listHtml += `
             <li class="leader-item">
               <span class="leader-rank">${i}</span>
@@ -330,12 +329,12 @@ function renderTop5(raw) {
       if (listHtml !== "") {
         container.innerHTML += `
           <div class="leader-card">
-            <h3>${title}</h3>
+            ${topPlayerImage} <h3>${title}</h3>
             <ul class="leader-list">${listHtml}</ul>
           </div>`;
       }
-    });
-  });
+    }
+  }
 }
 
 // 이벤트 바인딩
@@ -411,6 +410,36 @@ async function loadData() {
     console.error("데이터 로드 에러:", err);
   }
 }
+
+// 로블록스 API를 이용해 유저 아바타 URL 가져오기
+async function getRobloxAvatar(username) {
+  try {
+    // 1. 유저네임으로 유저 정보(ID) 가져오기
+    const userRes = await fetch("https://users.roblox.com/v1/usernames/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
+    });
+    const userData = await userRes.json();
+
+    if (userData.data && userData.data.length > 0) {
+      const userId = userData.data[0].id;
+
+      // 2. 유저 ID로 아바타 흉상(Bust) 이미지 가져오기
+      const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
+      const thumbData = await thumbRes.json();
+
+      if (thumbData.data && thumbData.data.length > 0) {
+        return thumbData.data[0].imageUrl;
+      }
+    }
+  } catch (err) {
+    console.error("로블록스 API 로드 에러:", err);
+  }
+  return null; // 실패 시 null 반환
+}
+
+
 
 // 초기화 실행
 setupModalEvents();
