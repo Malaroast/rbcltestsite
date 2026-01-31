@@ -77,6 +77,14 @@ function populateFilterOptions(tab) {
   const state = filters[tab]; select.value = state.col || "";
   document.getElementById("filterMin").value = state.min ?? "";
   document.getElementById("filterMax").value = state.max ?? "";
+  if (tab === 'top5') {
+    const filtersDiv = document.querySelector('.filters');
+    if (filtersDiv) filtersDiv.style.display = 'none'; // 필터 UI 숨기기
+    return;
+  } else {
+    const filtersDiv = document.querySelector('.filters');
+    if (filtersDiv) filtersDiv.style.display = 'flex'; // 타자/투수 탭에선 다시 보이기
+  }
 }
 
 // --- 수정된 부분: 순위 업데이트 로직 ---
