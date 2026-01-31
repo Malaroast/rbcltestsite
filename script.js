@@ -288,23 +288,35 @@ function setupTableClick() {
   });
 }
 
+// 3. 파일 맨 아래에 있는 renderTop5 함수를 이 코드로 덮어쓰세요.
 function renderTop5(raw) {
   const container = document.getElementById("leaderContainer");
   if (!container) return;
   container.innerHTML = "";
 
+  // B, E, H, K, N열 (선수 이름이 있는 열 인덱스)
   const colPairs = [1, 4, 7, 10, 13]; 
-  const rowGroups = [{start: 44, titleRow: 50}, {start: 51, titleRow: 58}]; 
+
+  // 사진 분석 결과: 
+  // 타자 섹션: 제목 45행(인덱스 44), 데이터 시작 46행(44+1)
+  // 투수 섹션: 제목 52행(인덱스 51), 데이터 시작 53행(51+1)
+  const rowGroups = [
+    {start: 44, titleRow: 44}, // 타자 부문 (B45, E45 등 제목 행)
+    {start: 51, titleRow: 51}  // 투수 부문 (B52, E52 등 제목 행)
+  ]; 
 
   rowGroups.forEach(group => {
     colPairs.forEach(colIdx => {
+      // 제목 가져오기 (이름 옆 칸: 타율, 홈런, wRC+ 등)
       const title = raw[group.titleRow]?.[colIdx + 1];
       if (!title) return;
       
       let listHtml = "";
+      // 각 부문당 1위부터 5위까지 가져오기
       for (let i = 1; i <= 5; i++) {
-        const name = raw[group.start + i]?.[colIdx];
-        const val = raw[group.start + i]?.[colIdx + 1];
+        const name = raw[group.start + i]?.[colIdx];     // 선수 이름
+        const val = raw[group.start + i]?.[colIdx + 1];  // 기록 값
+        
         if (name && name.trim() !== "") {
           listHtml += `
             <li class="leader-item">
@@ -314,12 +326,13 @@ function renderTop5(raw) {
             </li>`;
         }
       }
+
       if (listHtml !== "") {
-          container.innerHTML += `
-            <div class="leader-card">
-              <h3>${title}</h3>
-              <ul class="leader-list">${listHtml}</ul>
-            </div>`;
+        container.innerHTML += `
+          <div class="leader-card">
+            <h3>${title}</h3>
+            <ul class="leader-list">${listHtml}</ul>
+          </div>`;
       }
     });
   });
