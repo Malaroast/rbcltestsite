@@ -299,6 +299,30 @@ th.sort-desc::after { content:" v"; font-size:10px; }
   color:var(--ink);
 }
 
+/* 1등 플레이어 이미지 스타일 */
+.top-player-img {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 12px;
+  background: var(--accent-soft);
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--accent);
+}
+
+.top-player-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 사진이 추가됨에 따라 카드 높이가 변하므로 정렬 보정 */
+.leader-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 /* 리더보드 그리드 및 카드 디자인 추가 */
 .leader-grid {
   display: grid;
