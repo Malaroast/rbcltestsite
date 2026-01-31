@@ -379,6 +379,19 @@ th.sort-desc::after { content:" v"; font-size:10px; }
   color: var(--accent); /* 강조색 적용 */
 }
 
+/* --- 반응형 레이아웃 대응 --- */
+@media (max-width: 1200px) {
+  .leader-grid { grid-template-columns: repeat(3, 1fr); } /* 창이 작아지면 3개 */
+}
+
+@media (max-width: 800px) {
+  .leader-grid { grid-template-columns: repeat(2, 1fr); } /* 더 작아지면 2개 */
+}
+
+@media (max-width: 500px) {
+  .leader-grid { grid-template-columns: 1fr; } /* 모바일은 1개 */
+}
+
 .tab-content { display:none; }
 .tab-content.active { display:block; }
 
@@ -393,15 +406,3 @@ th.sort-desc::after { content:" v"; font-size:10px; }
   .tab-btn { padding:8px 12px; }
   .hero__text h1 { font-size:22px; }
 }
-
-/* --- 반응형 레이아웃 대응 --- */
-@media (max-width: 1200px) {
-  .leader-grid { grid-template-columns: repeat(3, 1fr); } /* 창이 작아지면 3개 */
-}
-
-@media (max-width: 800px) {
-  .leader-grid { grid-template-columns: repeat(2, 1fr); } /* 더 작아지면 2개 */
-}
-
-@media (max-width: 500px) {
-  .leader-grid { grid-template-columns: 1fr; } /* 모바일은 1개 */
