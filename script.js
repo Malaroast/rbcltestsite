@@ -1,7 +1,7 @@
 const battersCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7qAaMm3tG_1oEuIPbn4pLZiDzzwl6d-Ur-y3_fw9fXIjJN-SYwdap5rbmOk63nDApmzCiqYYa495j/pub?gid=0&single=true&output=csv";
 const pitchersCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7qAaMm3tG_1oEuIPbn4pLZiDzzwl6d-Ur-y3_fw9fXIjJN-SYwdap5rbmOk63nDApmzCiqYYa495j/pub?gid=249730824&single=true&output=csv";
 // League 시트의 GID 번호를 확인해서 수정하세요!
-const leagueCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7qAaMm3tG_1oEuIPbn4pLZiDzzwl6d-Ur-y3_fw9fXIjJN-SYwdap5rbmOk63nDApmzCiqYYa495j/pub?gid=953041926&single=true&output=csv";
+const leagueCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7qAaMm3tG_1oEuIPbn4pLZiDzzwl6d-Ur-y3_fw9fXIjJN-SYwdap5rbmOk63nDApmzCiqYYa495j/pub?gid=776680138&single=true&output=csv";
 
 const dataStore = { batters: { rows: [], map: {} }, pitchers: { rows: [], map: {} } };
 
@@ -87,4 +87,5 @@ function toObjects(csv) {
   const h = csv[0];
   return csv.slice(1).map(r => { let o = {}; h.forEach((k,i) => o[k]=r[i]); return o; }).filter(r => r["Player"]);
 }
+
 function mapByName(rows) { let m = {}; rows.forEach(r => m[r["Player"]] = r); return m; }
