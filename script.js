@@ -346,7 +346,7 @@ function renderTop5(raw) {
   container.innerHTML = "";
 
   const colPairs = [1, 4, 7, 10, 13]; // B, E, H, K, N열
-  const rowGroups = [{start: 44, titleRow: 44}, {start: 51, titleRow: 51}]; 
+  const rowGroups = [{start: 44, titleRow: 50}, {start: 51, titleRow: 58}]; 
 
   rowGroups.forEach(group => {
     colPairs.forEach(colIdx => {
