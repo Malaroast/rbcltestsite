@@ -25,7 +25,7 @@ const filters = {
   pitchers: { col: null, min: null, max: null }
 };
 
-// CSV 파서 및 데이터 변환 함수 (기존과 동일)
+// CSV 파서
 function parseCSV(text) {
   const rows = []; let row = []; let field = ""; let inQuotes = false;
   for (let i = 0; i < text.length; i++) {
@@ -59,8 +59,10 @@ function zeroRow(columns, name) {
 }
 
 function pick(row, columns) { return columns.map((col) => row?.[col] ?? ""); }
-function getActiveTab() { return document.querySelector(".tab-content.active")?.id || "batters"; }
+function getActiveTab() { return document.querySelector(".tab-content.active")?.id || "top5"; }
+
 function getNumericColumns(tab) {
+  if (tab === 'top5') return [];
   const skip = new Set([COLUMN_CONFIG.playerName, "소속 팀", "팀명"]);
   return COLUMN_CONFIG.table[tab].filter((col) => !skip.has(col));
 }
@@ -68,26 +70,30 @@ function getNumericColumns(tab) {
 function populateFilterOptions(tab) {
   const select = document.getElementById("filterColumn");
   if (!select) return;
-    if (tab === 'top5') {
-    const filtersDiv = document.querySelector('.filters');
-    if (filtersDiv) filtersDiv.style.display = 'none'; // 필터 UI 숨기기
+
+  const filtersDiv = document.querySelector('.filters');
+  if (tab === 'top5') {
+    if (filtersDiv) filtersDiv.style.display = 'none';
     return;
   } else {
-    const filtersDiv = document.querySelector('.filters');
-    if (filtersDiv) filtersDiv.style.display = 'flex'; // 타자/투수 탭에선 다시 보이기
+    if (filtersDiv) filtersDiv.style.display = 'flex';
   }
+
   select.innerHTML = "";
   const emptyOpt = document.createElement("option");
   emptyOpt.value = ""; emptyOpt.textContent = "전체"; select.appendChild(emptyOpt);
-  getNumericColumns(tab).forEach((col) => {
+  
+  const numericCols = getNumericColumns(tab);
+  numericCols.forEach((col) => {
     const opt = document.createElement("option"); opt.value = col; opt.textContent = col; select.appendChild(opt);
   });
-  const state = filters[tab]; select.value = state.col || "";
+
+  const state = filters[tab] || { col: null, min: null, max: null };
+  select.value = state.col || "";
   document.getElementById("filterMin").value = state.min ?? "";
   document.getElementById("filterMax").value = state.max ?? "";
 }
 
-// --- 수정된 부분: 순위 업데이트 로직 ---
 function updateRankNumbers(tableBody) {
   let count = 1;
   tableBody.querySelectorAll("tr").forEach((row) => {
@@ -100,14 +106,13 @@ function updateRankNumbers(tableBody) {
 
 function renderTable(category, tableId, columns, rows) {
   const table = document.getElementById(tableId);
+  if (!table) return;
   const thead = table.querySelector("thead");
   const tbody = table.querySelector("tbody");
   const nameField = COLUMN_CONFIG.playerName;
 
   thead.innerHTML = "";
   const headerRow = document.createElement("tr");
-
-  // [수정] 순위 헤더 추가
   const rankTh = document.createElement("th");
   rankTh.textContent = "순위";
   headerRow.appendChild(rankTh);
@@ -125,7 +130,7 @@ function renderTable(category, tableId, columns, rows) {
   if (!rows.length) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
-    td.colSpan = columns.length + 1; // 순위 컬럼 포함
+    td.colSpan = columns.length + 1;
     td.textContent = "데이터를 불러오지 못했습니다.";
     tr.appendChild(td);
     tbody.appendChild(tr);
@@ -134,8 +139,6 @@ function renderTable(category, tableId, columns, rows) {
 
   rows.forEach((row, rowIndex) => {
     const tr = document.createElement("tr");
-    
-    // [수정] 순위 데이터 셀 추가
     const rankTd = document.createElement("td");
     rankTd.className = "rank-cell";
     rankTd.textContent = rowIndex + 1;
@@ -147,7 +150,6 @@ function renderTable(category, tableId, columns, rows) {
         const span = document.createElement("span");
         span.className = "clickable player-link";
         span.dataset.player = cell;
-        span.dataset.category = category;
         span.textContent = cell;
         td.appendChild(span);
       } else {
@@ -163,8 +165,6 @@ function sortTable(tableId, col) {
   const table = document.getElementById(tableId);
   const tbody = table.querySelector("tbody");
   const rows = Array.from(tbody.querySelectorAll("tr"));
-
-  // [수정] 순위 컬럼이 추가되었으므로 데이터 컬럼 인덱스는 col + 1입니다.
   const dataColIndex = col + 1;
 
   const isAsc = sortState[tableId] && sortState[tableId].col === col && sortState[tableId].dir === "asc";
@@ -183,8 +183,6 @@ function sortTable(tableId, col) {
 
   tbody.innerHTML = "";
   rows.forEach((r) => tbody.appendChild(r));
-
-  // [수정] 정렬 후 번호 재부여
   updateRankNumbers(tbody);
 
   table.querySelectorAll("th").forEach((th) => th.classList.remove("sort-asc", "sort-desc"));
@@ -194,10 +192,12 @@ function sortTable(tableId, col) {
 
 function applyAllFilters() {
   const activeTab = getActiveTab();
-  if (tab === 'top5') return;
+  if (activeTab === 'top5') return; // 에러 방지: 리더보드 탭은 필터 무시
+
   const searchText = document.getElementById("searchInput").value.toLowerCase();
   const filter = filters[activeTab];
   const table = document.querySelector(`#${activeTab} table`);
+  if (!table) return;
   const tbody = table.querySelector("tbody");
   const headerCells = Array.from(table.querySelectorAll("th"));
   const colIndex = filter.col ? headerCells.findIndex((th) => th.textContent === filter.col) : -1;
@@ -216,15 +216,11 @@ function applyAllFilters() {
         if (filter.max !== null && num > filter.max) numericMatch = false;
       }
     }
-
     row.style.display = textMatch && numericMatch ? "" : "none";
   });
-
-  // [수정] 필터링 적용 후 보이는 결과에만 순서대로 번호 재부여
   updateRankNumbers(tbody);
 }
 
-// 이하 Modal 및 초기화 로직 (기존과 동일)
 function renderDetail(containerId, columns, row) {
   const container = document.getElementById(containerId); container.innerHTML = "";
   const grid = document.createElement("div"); grid.className = "detail-grid";
@@ -239,15 +235,21 @@ function renderDetail(containerId, columns, row) {
 
 function openModal(playerName) {
   const modal = document.getElementById("playerModal");
+  if (!modal) return;
   document.getElementById("modalPlayerName").textContent = playerName;
   const batterRow = dataStore.batters.map.get(playerName) || zeroRow(COLUMN_CONFIG.detail.batters, playerName);
   const pitcherRow = dataStore.pitchers.map.get(playerName) || zeroRow(COLUMN_CONFIG.detail.pitchers, playerName);
   renderDetail("detailBatters", COLUMN_CONFIG.detail.batters, batterRow);
   renderDetail("detailPitchers", COLUMN_CONFIG.detail.pitchers, pitcherRow);
+  
   document.querySelectorAll("[data-detail-tab]").forEach((btn) => btn.classList.remove("active"));
   document.querySelectorAll(".detail-content").forEach((c) => c.classList.remove("active"));
-  document.querySelector("[data-detail-tab='detailBatters']").classList.add("active");
-  document.getElementById("detailBatters").classList.add("active");
+  
+  const defaultTabBtn = document.querySelector("[data-detail-tab='detailBatters']");
+  if (defaultTabBtn) defaultTabBtn.classList.add("active");
+  const defaultContent = document.getElementById("detailBatters");
+  if (defaultContent) defaultContent.classList.add("active");
+  
   modal.classList.add("show"); modal.setAttribute("aria-hidden", "false");
 }
 
@@ -258,13 +260,19 @@ function closeModal() {
 
 function setupModalEvents() {
   const modal = document.getElementById("playerModal");
+  if (!modal) return;
   modal.addEventListener("click", (e) => { if (e.target.classList.contains("modal__overlay")) closeModal(); });
-  modal.querySelector(".modal__close").addEventListener("click", closeModal);
+  const closeBtn = modal.querySelector(".modal__close");
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  
   document.querySelectorAll("[data-detail-tab]").forEach((btn) => {
     btn.addEventListener("click", () => {
       document.querySelectorAll("[data-detail-tab]").forEach((b) => b.classList.remove("active"));
       document.querySelectorAll(".detail-content").forEach((c) => c.classList.remove("active"));
-      btn.classList.add("active"); document.getElementById(btn.dataset.detailTab).classList.add("active");
+      btn.classList.add("active"); 
+      const targetId = btn.dataset.detailTab;
+      const targetContent = document.getElementById(targetId);
+      if (targetContent) targetContent.classList.add("active");
     });
   });
 }
@@ -280,30 +288,76 @@ function setupTableClick() {
   });
 }
 
+function renderTop5(raw) {
+  const container = document.getElementById("leaderContainer");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const colPairs = [1, 4, 7, 10, 13]; 
+  const rowGroups = [{start: 44, titleRow: 50}, {start: 51, titleRow: 58}]; 
+
+  rowGroups.forEach(group => {
+    colPairs.forEach(colIdx => {
+      const title = raw[group.titleRow]?.[colIdx + 1];
+      if (!title) return;
+      
+      let listHtml = "";
+      for (let i = 1; i <= 5; i++) {
+        const name = raw[group.start + i]?.[colIdx];
+        const val = raw[group.start + i]?.[colIdx + 1];
+        if (name && name.trim() !== "") {
+          listHtml += `
+            <li class="leader-item">
+              <span class="leader-rank">${i}</span>
+              <span class="leader-name" onclick="openModal('${name}')">${name}</span>
+              <span class="leader-value">${val}</span>
+            </li>`;
+        }
+      }
+      if (listHtml !== "") {
+          container.innerHTML += `
+            <div class="leader-card">
+              <h3>${title}</h3>
+              <ul class="leader-list">${listHtml}</ul>
+            </div>`;
+      }
+    });
+  });
+}
+
+// 이벤트 바인딩
 document.getElementById("searchInput").addEventListener("input", applyAllFilters);
+
 document.getElementById("applyFilter").addEventListener("click", () => {
   const tab = getActiveTab();
+  if (tab === 'top5') return;
   const col = document.getElementById("filterColumn").value || null;
   const minVal = parseFloat(document.getElementById("filterMin").value);
   const maxVal = parseFloat(document.getElementById("filterMax").value);
   filters[tab] = { col, min: isNaN(minVal) ? null : minVal, max: isNaN(maxVal) ? null : maxVal };
   applyAllFilters();
 });
+
 document.getElementById("clearFilter").addEventListener("click", () => {
-  const tab = getActiveTab(); filters[tab] = { col: null, min: null, max: null };
-  document.getElementById("filterColumn").value = ""; document.getElementById("filterMin").value = ""; document.getElementById("filterMax").value = "";
+  const tab = getActiveTab();
+  if (tab === 'top5') return;
+  filters[tab] = { col: null, min: null, max: null };
+  document.getElementById("filterColumn").value = ""; 
+  document.getElementById("filterMin").value = ""; 
+  document.getElementById("filterMax").value = "";
   applyAllFilters();
 });
+
 document.querySelectorAll(".tab-btn[data-tab]").forEach((btn) => {
   btn.addEventListener("click", () => {
-    const tabName = btn.dataset.tab; // 추가
+    const tabName = btn.dataset.tab;
     document.querySelectorAll(".tab-btn[data-tab]").forEach((b) => b.classList.remove("active"));
     document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
     
     btn.classList.add("active"); 
-    document.getElementById(tabName).classList.add("active");
+    const content = document.getElementById(tabName);
+    if (content) content.classList.add("active");
     
-    // 수정된 부분: top5가 아닐 때만 필터와 정렬을 수행
     populateFilterOptions(tabName); 
     if (tabName !== 'top5') {
       applyAllFilters();
@@ -319,27 +373,24 @@ async function loadData() {
       fetch(leagueCSV)
     ]);
     
-    const bData = toObjects(parseCSV(await bRes.text()));
-    const pData = toObjects(parseCSV(await pRes.text()));
+    const bRaw = parseCSV(await bRes.text());
+    const pRaw = parseCSV(await pRes.text());
     const lRaw = parseCSV(await lRes.text());
+
+    const bData = toObjects(bRaw);
+    const pData = toObjects(pRaw);
 
     dataStore.batters = { ...bData, map: mapByName(bData.rows) };
     dataStore.pitchers = { ...pData, map: mapByName(pData.rows) };
     
-    // 리더보드 그리기
     renderTop5(lRaw); 
-
-    // 테이블 그리기
     renderTable("batters", "battersTable", COLUMN_CONFIG.table.batters, dataStore.batters.rows);
     renderTable("pitchers", "pitchersTable", COLUMN_CONFIG.table.pitchers, dataStore.pitchers.rows);
     
     setupTableClick();
-    
-    // 현재 탭 확인 후 필터 적용
     const currentTab = getActiveTab();
     populateFilterOptions(currentTab);
     
-    // 현재 탭이 top5가 아닐 때만 필터 실행
     if (currentTab !== 'top5') {
       applyAllFilters();
     }
@@ -348,69 +399,6 @@ async function loadData() {
   }
 }
 
-async function loadData() {
-  try {
-    const [bRes, pRes, lRes] = await Promise.all([
-      fetch(battersCSV), 
-      fetch(pitchersCSV),
-      fetch(leagueCSV) // 추가
-    ]);
-    
-    const bData = toObjects(parseCSV(await bRes.text()));
-    const pData = toObjects(parseCSV(await pRes.text()));
-    const lRaw = parseCSV(await lRes.text()); // 추가
-
-    dataStore.batters = { ...bData, map: mapByName(bData.rows) };
-    dataStore.pitchers = { ...pData, map: mapByName(pData.rows) };
-    
-    // 리더보드 실행 함수 추가
-    renderTop5(lRaw); 
-
-    renderTable("batters", "battersTable", COLUMN_CONFIG.table.batters, dataStore.batters.rows);
-    renderTable("pitchers", "pitchersTable", COLUMN_CONFIG.table.pitchers, dataStore.pitchers.rows);
-    setupTableClick();
-    populateFilterOptions(getActiveTab());
-    applyAllFilters();
-  } catch (err) {
-    console.error("데이터 로드 에러:", err);
-  }
-}
-
-// 3. 파일 맨 아래에 renderTop5 함수 추가
-function renderTop5(raw) {
-  const container = document.getElementById("leaderContainer");
-  if (!container) return;
-  container.innerHTML = "";
-
-  const colPairs = [1, 4, 7, 10, 13]; // B, E, H, K, N열
-  const rowGroups = [{start: 44, titleRow: 50}, {start: 51, titleRow: 58}]; 
-
-  rowGroups.forEach(group => {
-    colPairs.forEach(colIdx => {
-      const title = raw[group.titleRow]?.[colIdx + 1];
-      if (!title) return;
-      
-      let listHtml = "";
-      for (let i = 1; i <= 5; i++) {
-        const name = raw[group.start + i]?.[colIdx];
-        const val = raw[group.start + i]?.[colIdx + 1];
-        if (name) {
-          listHtml += `
-            <li class="leader-item">
-              <span class="leader-rank">${i}</span>
-              <span class="leader-name" onclick="openModal('${name}')">${name}</span>
-              <span class="leader-value">${val}</span>
-            </li>`;
-        }
-      }
-      container.innerHTML += `
-        <div class="leader-card">
-          <h3>${title}</h3>
-          <ul class="leader-list">${listHtml}</ul>
-        </div>`;
-    });
-  });
-}
-
+// 초기화 실행
 setupModalEvents();
 document.addEventListener("DOMContentLoaded", loadData);
