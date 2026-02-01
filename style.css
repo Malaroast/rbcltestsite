@@ -388,15 +388,6 @@ th.sort-desc::after { content:" v"; font-size:10px; }
   font-size: 12px;
 }
 
-네, 가능합니다! 닉네임을 파란색으로 변경하여 클릭 가능하다는 느낌을 주고, 1등(첫 번째 항목)의 순위 숫자를 키워서 강조하는 CSS 코드를 작성했습니다.
-
-style.css 파일에서 아래 두 부분을 찾아서 수정하거나 코드를 추가해 주세요.
-
-1. 닉네임 색상 변경 (파란색)
-기존 .leader-name 클래스를 찾아서 color 속성을 var(--ink)에서 **var(--accent)**로 변경합니다.
-
-CSS
-
 /* style.css 에서 기존 코드 수정 */
 .leader-name {
   flex-grow: 1;
