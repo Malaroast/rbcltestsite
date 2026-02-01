@@ -414,40 +414,37 @@ async function loadData() {
 async function getRobloxAvatar(username) {
   try {
     const myProxy = "https://floral-recipe-7246.mhr090830.workers.dev/"; 
-    const targetApi = "https://users.roblox.com/v1/usernames/users";
+    const userApi = "https://users.roblox.com/v1/usernames/users";
     
     // 1. 유저 ID 가져오기
-    const res = await fetch(`${myProxy}?url=${encodeURIComponent(targetApi)}`, {
+    const userRes = await fetch(`${myProxy}?url=${encodeURIComponent(userApi)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
     });
+    const userData = await userRes.json();
 
-    const data = await res.json();
+    if (userData.data && userData.data.length > 0) {
+      const userId = userData.data[0].id;
+      
+      // 2. 썸네일 API 호출 (제공해주신 이미지의 API 방식 적용)
+      const thumbApi = `https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userId}&size=150x150&format=Png&isCircular=false`;
+      const thumbRes = await fetch(`${myProxy}?url=${encodeURIComponent(thumbApi)}`);
+      const thumbData = await thumbRes.json();
 
-    if (data.data && data.data.length > 0) {
-      const userId = data.data[0].id;
-      
-      // 2. 이미지 주소 생성
-      const imageUrl = `https://thumbnails.roblox.com/v1/users/avatar-bust?userId=${userId}&size=180x180&format=Png&isCircular=ture`;
-      // 최종 주소 생성
-      const finalUrl = `${myProxy}?url=${encodeURIComponent(imageUrl)}`;
-      
-      // [디버깅] 여기서 로그를 찍어야 변수를 인식합니다.
-      console.log(`${username}의 최종 이미지 주소:`, finalUrl);
-      
-      return finalUrl;
-    } else {
-      console.warn(`${username} 유저를 로블록스에서 찾을 수 없습니다.`);
+      // 3. Response body에서 imageUrl 추출
+      if (thumbData.data && thumbData.data.length > 0) {
+        const finalImageUrl = thumbData.data[0].imageUrl;
+        console.log(`${username}의 실제 이미지 경로:`, finalImageUrl);
+        return finalImageUrl;
+      }
     }
   } catch (err) {
     console.error("로블록스 이미지 로드 실패:", err);
   }
-  
   // 실패 시 기본 아바타
   return "https://tr.rbxcdn.com/38c6ed8c6360255caffabcde41f13903/150/150/AvatarBust/Png";
 }
-
 
 // 초기화 실행
 setupModalEvents();
