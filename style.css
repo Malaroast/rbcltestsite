@@ -21,7 +21,7 @@ body {
 
 /* [중요] 전체 레이아웃 너비를 줄여서 좌우 공백 확보 */
 .page {
-  max-width: 1080px; /* 기존 1200px -> 1080px로 축소 */
+  max-width: 1200px; /* 기존 1200px -> 1080px로 축소 */
   margin: 0 auto;    /* 중앙 정렬 */
   padding: 40px 24px; /* 위아래 여백을 늘려 시원한 느낌 */
 }
@@ -133,16 +133,19 @@ body {
 }
 
 /* style.css 에서 .table-card를 찾아 아래 내용으로 변경 */
+/* style.css .table-card 찾아서 덮어쓰기 */
 .table-card {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 14px;
   
-  /* [중요] 내용이 많으면 가로 스크롤이 생기도록 설정 */
-  overflow-x: auto; 
+  /* 스크롤바 제거 및 내용물 다 보여주기 */
+  overflow: visible; 
+  display: block;
+  width: 100%;
   
   box-shadow: 0 15px 30px rgba(15,23,42,0.06);
-  margin-bottom: 24px; /* 아래쪽 여백 살짝 추가 */
+  margin-bottom: 24px;
 }
 
 table {
@@ -432,6 +435,31 @@ th.sort-desc::after { content:" v"; font-size:10px; }
   color: var(--ink); 
   flex-shrink: 0; 
   font-size: 12px;
+}
+
+/* [필수] 표 압축 스타일 (스크롤 없이 한눈에 보기) */
+
+/* 1. 테이블을 카드 너비에 딱 맞춤 */
+.table-card table {
+  width: 100%;        /* 무조건 부모 너비(화면)에 맞춤 */
+  table-layout: auto; /* 내용 길이에 따라 칸 크기 자동 조절 */
+  border-collapse: collapse;
+}
+
+/* 2. 칸 내부 여백과 글자 크기 줄이기 (다이어트) */
+.table-card th, 
+.table-card td {
+  padding: 10px 4px;  /* 좌우 여백을 4px로 줄임 (기존 10~16px) */
+  font-size: 13px;    /* 글자 크기를 살짝 줄임 (공간 확보) */
+  white-space: nowrap; /* 줄바꿈 금지 (한 줄 유지) */
+  
+  /* 만약 그래도 좁다면 아래 주석을 풀어서 글자를 더 줄이세요 */
+  /* letter-spacing: -0.5px; */ 
+}
+
+/* 3. 모바일 등 화면이 너무 작아지면 글자가 겹치는 것 방지 (선택사항) */
+@media (max-width: 768px) {
+  .table-card { overflow-x: auto; } /* 모바일에서는 어쩔 수 없이 스크롤 허용 */
 }
 
 @media(max-width:900px){
