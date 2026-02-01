@@ -309,13 +309,14 @@ async function renderTop5(raw) {
         const val = raw[group.start + i]?.[colIdx + 1];
         
         if (name && name.trim() !== "") {
-          // 1등인 경우 로블록스 사진 가져오기
-          if (i === 1) {
-            const avatarUrl = await getRobloxAvatar(name);
-            if (avatarUrl) {
-              topPlayerImage = `<div class="top-player-img"><img src="${avatarUrl}" alt="${name}"></div>`;
-            }
-          }
+// i === 1 (1등)일 때 실행되는 구간
+if (i === 1) {
+  const avatarUrl = await getRobloxAvatar(name); // 위에서 수정한 함수 호출
+  topPlayerImage = `
+    <div class="top-player-img">
+      <img src="${avatarUrl}" alt="${name}" onerror="this.src='기본이미지주소'">
+    </div>`;
+}
 
           listHtml += `
             <li class="leader-item">
