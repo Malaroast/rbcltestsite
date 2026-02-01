@@ -293,7 +293,7 @@ async function renderTop5(raw) {
   if (!container) return;
   container.innerHTML = "";
 
-  const colPairs = [1, 4, 7, 10, 13]; 
+  const colPairs = [1, 4, 7, 10, 13, 16, 19, 22, 25]; 
   const rowGroups = [{start: 44, titleRow: 44}, {start: 51, titleRow: 51}]; 
 
   for (const group of rowGroups) {
