@@ -413,11 +413,10 @@ async function loadData() {
 
 async function getRobloxAvatar(username) {
   try {
-    // [중요] 본인의 Cloudflare Worker 주소를 정확히 넣어주세요 (끝에 / 확인)
     const myProxy = "https://floral-recipe-7246.mhr090830.workers.dev/"; 
     const targetApi = "https://users.roblox.com/v1/usernames/users";
     
-    // 1. 유저 ID 가져오기 (Worker 경유)
+    // 1. 유저 ID 가져오기
     const res = await fetch(`${myProxy}?url=${encodeURIComponent(targetApi)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -432,16 +431,24 @@ async function getRobloxAvatar(username) {
       // 2. 이미지 주소 생성
       const imageUrl = `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
       
-      // 3. 이미지 주소도 CORS 에러가 난다면 Worker를 거쳐서 가져오도록 설정
-      // 이렇게 하면 브라우저는 로블록스가 아닌 사용자님의 Worker에서 이미지를 직접 받습니다.
-      return `${myProxy}?url=${encodeURIComponent(imageUrl)}`;
+      // 최종 주소 생성
+      const finalUrl = `${myProxy}?url=${encodeURIComponent(imageUrl)}`;
+      
+      // [디버깅] 여기서 로그를 찍어야 변수를 인식합니다.
+      console.log(`${username}의 최종 이미지 주소:`, finalUrl);
+      
+      return finalUrl;
+    } else {
+      console.warn(`${username} 유저를 로블록스에서 찾을 수 없습니다.`);
     }
   } catch (err) {
     console.error("로블록스 이미지 로드 실패:", err);
   }
+  
   // 실패 시 기본 아바타
   return "https://tr.rbxcdn.com/38c6ed8c6360255caffabcde41f13903/150/150/AvatarBust/Png";
 }
+
 
 // 초기화 실행
 setupModalEvents();
