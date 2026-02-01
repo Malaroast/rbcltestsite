@@ -413,29 +413,29 @@ async function loadData() {
 
 async function getRobloxAvatar(username) {
   try {
-    // corsproxy.io는 주소 앞에 붙이기만 하면 되며, 응답을 변형하지 않습니다.
-    const proxy = "https://corsproxy.io/?";
+    // [중요] 여기에 본인의 Cloudflare Worker 주소를 넣으세요.
+    const myProxy = "https://floral-recipe-7246.mhr090830.workers.dev/"; 
     const target = "https://users.roblox.com/v1/usernames/users";
     
-    const res = await fetch(proxy + encodeURIComponent(target), {
+    // 1. 유저 ID 가져오기
+    const res = await fetch(`${myProxy}?url=${encodeURIComponent(target)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
     });
 
-    if (!res.ok) throw new Error("Proxy Error");
-    
-    const data = await res.json(); // 이제 JSON.parse 없이 바로 사용 가능
+    const data = await res.json();
 
     if (data.data && data.data.length > 0) {
       const userId = data.data[0].id;
-      // 이미지 API는 굳이 프록시를 안 써도 브라우저에서 바로 로딩되는 경우가 많습니다.
+      // 2. 헤드샷 썸네일 URL 반환 (이미지 주소는 프록시 없이도 잘 작동합니다)
       return `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
     }
   } catch (err) {
     console.error("로블록스 이미지 로드 실패:", err);
   }
-  return "https://tr.rbxcdn.com/38c6ed8c6360255caffabcde41f13903/150/150/AvatarBust/Png"; 
+  // 실패 시 기본 아바타
+  return "https://tr.rbxcdn.com/38c6ed8c6360255caffabcde41f13903/150/150/AvatarBust/Png";
 }
 
 // 초기화 실행
