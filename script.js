@@ -413,36 +413,30 @@ async function loadData() {
 
 async function getRobloxAvatar(username) {
   try {
-    // 1. 유저네임으로 유저 정보를 가져오는 GET 전용 API (allorigins 경유)
-    // POST 대신 GET으로 처리하기 위해 allorigins의 기본 기능을 활용합니다.
-    const userSearchUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://www.roblox.com/search/users/results?keyword=${username}&maxRows=1&startIndex=0`)}`;
+    // corsproxy.io는 주소 앞에 붙이기만 하면 되며, 응답을 변형하지 않습니다.
+    const proxy = "https://corsproxy.io/?";
+    const target = "https://users.roblox.com/v1/usernames/users";
     
-    const userRes = await fetch(userSearchUrl);
-    const userJson = await userRes.json();
-    // allorigins는 응답을 문자열로 주므로 JSON.parse가 필요합니다.
-    const userData = JSON.parse(userJson.contents);
+    const res = await fetch(proxy + encodeURIComponent(target), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
+    });
 
-    // 검색 결과에서 UserId 추출
-    if (userData.UserSearchResults && userData.UserSearchResults.length > 0) {
-      const userId = userData.UserSearchResults[0].UserId;
+    if (!res.ok) throw new Error("Proxy Error");
+    
+    const data = await res.json(); // 이제 JSON.parse 없이 바로 사용 가능
 
-      // 2. 유저 ID로 아바타 흉상(Bust) 이미지 가져오기
-      const thumbUrl = `https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userId}&size=150x150&format=Png&isCircular=false`;
-      const thumbRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(thumbUrl)}`);
-      const thumbJson = await thumbRes.json();
-      const thumbData = JSON.parse(thumbJson.contents);
-
-      if (thumbData.data && thumbData.data.length > 0) {
-        return thumbData.data[0].imageUrl;
-      }
+    if (data.data && data.data.length > 0) {
+      const userId = data.data[0].id;
+      // 이미지 API는 굳이 프록시를 안 써도 브라우저에서 바로 로딩되는 경우가 많습니다.
+      return `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
     }
   } catch (err) {
     console.error("로블록스 이미지 로드 실패:", err);
   }
-  return "https://tr.rbxcdn.com/38c6ed8c6360255caffabcde41f13903/150/150/AvatarBust/Png"; // 실패 시 기본 아바타
+  return "https://tr.rbxcdn.com/38c6ed8c6360255caffabcde41f13903/150/150/AvatarBust/Png"; 
 }
-
-
 
 // 초기화 실행
 setupModalEvents();
