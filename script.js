@@ -413,12 +413,12 @@ async function loadData() {
 
 async function getRobloxAvatar(username) {
   try {
-    // [중요] 여기에 본인의 Cloudflare Worker 주소를 넣으세요.
-    const myProxy = "https://floral-recipe-7246.mhr090830.workers.dev/"; 
-    const target = "https://users.roblox.com/v1/usernames/users";
+    // [중요] 본인의 Cloudflare Worker 주소를 정확히 넣어주세요 (끝에 / 확인)
+    const myProxy = "https://roblox-proxy.자신의아이디.workers.dev/"; 
+    const targetApi = "https://users.roblox.com/v1/usernames/users";
     
-    // 1. 유저 ID 가져오기
-    const res = await fetch(`${myProxy}?url=${encodeURIComponent(target)}`, {
+    // 1. 유저 ID 가져오기 (Worker 경유)
+    const res = await fetch(`${myProxy}?url=${encodeURIComponent(targetApi)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
@@ -428,8 +428,13 @@ async function getRobloxAvatar(username) {
 
     if (data.data && data.data.length > 0) {
       const userId = data.data[0].id;
-      // 2. 헤드샷 썸네일 URL 반환 (이미지 주소는 프록시 없이도 잘 작동합니다)
-      return `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
+      
+      // 2. 이미지 주소 생성
+      const imageUrl = `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
+      
+      // 3. 이미지 주소도 CORS 에러가 난다면 Worker를 거쳐서 가져오도록 설정
+      // 이렇게 하면 브라우저는 로블록스가 아닌 사용자님의 Worker에서 이미지를 직접 받습니다.
+      return `${myProxy}?url=${encodeURIComponent(imageUrl)}`;
     }
   } catch (err) {
     console.error("로블록스 이미지 로드 실패:", err);
