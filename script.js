@@ -411,32 +411,24 @@ async function loadData() {
   }
 }
 
-// 로블록스 API를 이용해 유저 아바타 URL 가져오기
 async function getRobloxAvatar(username) {
   try {
-    // CORS 문제를 피하기 위해 allorigins 프록시를 경유합니다.
-    const proxyUrl = "https://api.allorigins.win/get?url=";
-    const targetUrl = encodeURIComponent("https://users.roblox.com/v1/usernames/users");
-
-    // 1. 유저네임으로 유저 정보(ID) 가져오기
-    const userRes = await fetch(`${proxyUrl}${targetUrl}`, {
-      method: "POST",
-      // Proxy 서비스 규칙에 따라 POST 요청 시 body 처리가 다를 수 있어 
-      // Allorigins의 경우 아래처럼 요청 형식을 맞춰야 할 수 있습니다.
-    });
+    // 1. 유저네임으로 유저 정보를 가져오는 GET 전용 API (allorigins 경유)
+    // POST 대신 GET으로 처리하기 위해 allorigins의 기본 기능을 활용합니다.
+    const userSearchUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://www.roblox.com/search/users/results?keyword=${username}&maxRows=1&startIndex=0`)}`;
     
-    // [참고] 무료 프록시는 POST 요청 제약이 많으므로 
-    // 아래와 같이 GET 방식으로 우회하는 프록시 전용 로직이 필요할 수 있습니다.
-    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://users.roblox.com/v1/usernames/users?usernames=${username}`)}`);
-    const json = await response.json();
-    const userData = JSON.parse(json.contents);
+    const userRes = await fetch(userSearchUrl);
+    const userJson = await userRes.json();
+    // allorigins는 응답을 문자열로 주므로 JSON.parse가 필요합니다.
+    const userData = JSON.parse(userJson.contents);
 
-    if (userData.data && userData.data.length > 0) {
-      const userId = userData.data[0].id;
+    // 검색 결과에서 UserId 추출
+    if (userData.UserSearchResults && userData.UserSearchResults.length > 0) {
+      const userId = userData.UserSearchResults[0].UserId;
 
-      // 2. 유저 ID로 아바타 이미지 가져오기 (이건 GET이라 더 수월합니다)
-      const thumbTarget = `https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userId}&size=150x150&format=Png&isCircular=false`;
-      const thumbRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(thumbTarget)}`);
+      // 2. 유저 ID로 아바타 흉상(Bust) 이미지 가져오기
+      const thumbUrl = `https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userId}&size=150x150&format=Png&isCircular=false`;
+      const thumbRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(thumbUrl)}`);
       const thumbJson = await thumbRes.json();
       const thumbData = JSON.parse(thumbJson.contents);
 
@@ -445,9 +437,9 @@ async function getRobloxAvatar(username) {
       }
     }
   } catch (err) {
-    console.error("로블록스 API 로드 에러 (CORS):", err);
+    console.error("로블록스 이미지 로드 실패:", err);
   }
-  return null;
+  return "https://tr.rbxcdn.com/38c6ed8c6360255caffabcde41f13903/150/150/AvatarBust/Png"; // 실패 시 기본 아바타
 }
 
 
