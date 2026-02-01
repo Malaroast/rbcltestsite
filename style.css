@@ -132,12 +132,17 @@ body {
   font-size: 14px;
 }
 
+/* style.css 에서 .table-card를 찾아 아래 내용으로 변경 */
 .table-card {
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:14px;
-  overflow:hidden;
-  box-shadow:0 15px 30px rgba(15,23,42,0.06);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  
+  /* [중요] 내용이 많으면 가로 스크롤이 생기도록 설정 */
+  overflow-x: auto; 
+  
+  box-shadow: 0 15px 30px rgba(15,23,42,0.06);
+  margin-bottom: 24px; /* 아래쪽 여백 살짝 추가 */
 }
 
 table {
@@ -149,12 +154,16 @@ thead {
   background:#f8fafc;
 }
 
+/* style.css 에서 th, td를 찾아 아래 내용으로 변경(혹은 덮어쓰기) */
 th, td {
-  border-bottom:1px solid var(--line);
-  padding:12px 10px;
-  text-align:center;
-  cursor:default;
-  font-size:14px;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 16px; /* 좌우 패딩을 조금 넉넉히 줌 */
+  text-align: center;
+  cursor: default;
+  font-size: 14px;
+  
+  /* [중요] 글자가 좁아져도 줄바꿈 되지 않고 한 줄로 버티게 함 */
+  white-space: nowrap; 
 }
 
 th {
