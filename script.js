@@ -414,7 +414,7 @@ async function loadData() {
 async function getRobloxAvatar(username) {
   try {
     // [중요] 본인의 Cloudflare Worker 주소를 정확히 넣어주세요 (끝에 / 확인)
-    const myProxy = "https://roblox-proxy.자신의아이디.workers.dev/"; 
+    const myProxy = "https://floral-recipe-7246.mhr090830.workers.dev/"; 
     const targetApi = "https://users.roblox.com/v1/usernames/users";
     
     // 1. 유저 ID 가져오기 (Worker 경유)
