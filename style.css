@@ -16,12 +16,14 @@ body {
   color:var(--ink);
   margin:0;
   padding:0;
+  overflow-y: scroll; /* 스크롤바 유동 방지 */
 }
 
+/* [중요] 전체 레이아웃 너비를 줄여서 좌우 공백 확보 */
 .page {
-  max-width:1200px;
-  margin:0 auto;
-  padding:32px 20px 48px;
+  max-width: 1080px; /* 기존 1200px -> 1080px로 축소 */
+  margin: 0 auto;    /* 중앙 정렬 */
+  padding: 40px 24px; /* 위아래 여백을 늘려 시원한 느낌 */
 }
 
 .hero {
@@ -74,12 +76,13 @@ body {
 
 .tab-btn {
   border:none;
-  padding:10px 16px;
+  padding:8px 14px;
   border-radius:10px;
   cursor:pointer;
   background:transparent;
   color:var(--muted);
   font-weight:600;
+  font-size: 13px;
   transition:all 0.2s ease;
 }
 
@@ -100,7 +103,7 @@ body {
 
 #searchInput {
   padding:10px 14px;
-  min-width:240px;
+  min-width:220px;
   border:1px solid var(--line);
   border-radius:10px;
   background:#f8fafc;
@@ -114,7 +117,8 @@ body {
 }
 
 .section-head {
-  margin:28px 0 12px;
+  margin:32px 0 16px;
+  padding-left: 4px;
 }
 
 .section-head h2 {
@@ -125,6 +129,7 @@ body {
 .section-head p {
   margin:6px 0 0;
   color:var(--muted);
+  font-size: 14px;
 }
 
 .table-card {
@@ -157,7 +162,7 @@ th {
   color:var(--muted);
   letter-spacing:0.01em;
   text-transform:uppercase;
-  font-size:12px;
+  font-size:11px;
   cursor:pointer;
   position:relative;
   user-select:none;
@@ -175,6 +180,7 @@ th.sort-desc::after { content:" v"; font-size:10px; }
   cursor:pointer;
 }
 
+/* 모달 관련 스타일 */
 .modal {
   position:fixed;
   inset:0;
@@ -299,102 +305,127 @@ th.sort-desc::after { content:" v"; font-size:10px; }
   color:var(--ink);
 }
 
-/* 1등 플레이어 이미지 스타일 */
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* ------------------------------------------------------------------
+   [리더보드 카드 그리드 디자인 수정] 
+   - 카드 크기 대폭 축소, 유동적 배치, 좌우 공백 확보
+   ------------------------------------------------------------------ */
+
+.leader-grid {
+  display: grid;
+  /* [수정] 카드 최소 너비를 200px로 줄여서 더 작게 만듦. 
+     공간이 남으면 자동으로 줄바꿈 처리 (5개 고정 아님) */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px; /* 카드 사이 간격 */
+  margin-top: 20px;
+}
+
+.leader-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px; /* 내부 여백 축소 */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.leader-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+/* 1등 사진 크기 축소 */
 .top-player-img {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 12px;
-  background: var(--accent-soft);
+  width: 56px;  /* 80px -> 56px로 크기 대폭 축소 */
+  height: 56px;
+  margin: 0 auto 10px;
   border-radius: 50%;
-  overflow: hidden;
   border: 2px solid var(--accent);
+  background-color: var(--accent-soft);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .top-player-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-/* 사진이 추가됨에 따라 카드 높이가 변하므로 정렬 보정 */
-.leader-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-/* 리더보드 그리드 및 카드 디자인 추가 */
-.leader-grid {
-  display: grid;
-  /* 한 줄에 최대 5개 유지 */
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-  margin-top: 24px;
-}
-.leader-card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  text-align: center;
-}
 .leader-card h3 {
-  font-size: 18px;
+  font-size: 14px; /* 타이틀 글자 크기 축소 */
   color: var(--accent);
-  margin: 0 0 15px 0;
-  padding-bottom: 10px;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
   border-bottom: 2px solid var(--accent-soft);
 }
+
 .leader-list { list-style: none; padding: 0; margin: 0; }
+
 .leader-item {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* 세로 중앙 정렬 */
-  padding: 8px 0;
+  align-items: center;
+  padding: 5px 0; /* 리스트 위아래 간격 축소 */
   border-bottom: 1px dashed var(--line);
-  font-size: 14px;
-  gap: 8px; /* 항목 간 간격 확보 */
+  font-size: 13px; /* 리스트 글자 크기 축소 */
+  gap: 8px;
 }
+
 .leader-item:last-child { border-bottom: none; }
-.leader-rank { font-weight: 800; color: var(--muted); flex-shrink: 0; }
+
+.leader-rank { 
+  font-weight: 800; 
+  color: var(--muted); 
+  flex-shrink: 0; 
+  width: 14px; 
+  font-size: 12px;
+}
+
 .leader-name { 
   flex-grow: 1; 
   text-align: left; 
-  padding-left: 10px; 
+  padding-left: 4px; 
   font-weight: 600; 
   cursor: pointer; 
-  color: var(--accent);
-  /* 닉네임 길이 조절 로직 */
-  font-size: 13px;
+  color: var(--ink);
+  
+  /* 긴 닉네임은 ...으로 표시 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0; /* flex 환경에서 말줄임표 작동을 위한 설정 */
+  max-width: 90px; 
 }
+
 .leader-value { 
   font-weight: 700; 
   color: var(--ink); 
-  flex-shrink: 0; /* 숫자 영역 보호 */
-}
-
-.tab-content { display:none; }
-.tab-content.active { display:block; }
-
-@media(max-width:1200px){
-  .leader-grid { grid-template-columns: repeat(3, 1fr); }
+  flex-shrink: 0; 
+  font-size: 12px;
 }
 
 @media(max-width:900px){
   .hero { align-items:flex-start; }
   .controls { width:100%; }
   #searchInput { width:100%; min-width:auto; }
-  .leader-grid { grid-template-columns: repeat(2, 1fr); }
+  
+  /* 모바일에서는 카드가 더 작아지도록 설정 */
+  .leader-grid { 
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+    gap: 16px;
+  }
 }
 
 @media(max-width:640px){
+  /* 모바일 화면에서는 여백을 조금 줄여서 내용이 잘 보이게 함 */
+  .page { padding: 20px 16px; } 
   th, td { padding:10px 6px; font-size:12px; }
   .tab-btn { padding:8px 12px; }
   .hero__text h1 { font-size:22px; }
-  .leader-grid { grid-template-columns: 1fr; }
 }
