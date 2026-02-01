@@ -388,19 +388,43 @@ th.sort-desc::after { content:" v"; font-size:10px; }
   font-size: 12px;
 }
 
-.leader-name { 
-  flex-grow: 1; 
-  text-align: left; 
-  padding-left: 4px; 
-  font-weight: 600; 
-  cursor: pointer; 
-  color: var(--ink);
-  
-  /* 긴 닉네임은 ...으로 표시 */
+네, 가능합니다! 닉네임을 파란색으로 변경하여 클릭 가능하다는 느낌을 주고, 1등(첫 번째 항목)의 순위 숫자를 키워서 강조하는 CSS 코드를 작성했습니다.
+
+style.css 파일에서 아래 두 부분을 찾아서 수정하거나 코드를 추가해 주세요.
+
+1. 닉네임 색상 변경 (파란색)
+기존 .leader-name 클래스를 찾아서 color 속성을 var(--ink)에서 **var(--accent)**로 변경합니다.
+
+CSS
+
+/* style.css 에서 기존 코드 수정 */
+.leader-name {
+  flex-grow: 1;
+  text-align: left;
+  padding-left: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  /* color: var(--ink);  <-- 기존 색상 주석 처리 또는 삭제 */
+  color: var(--accent); /* [수정] 파란색 강조 색상 적용 */
+
+  /* 긴 닉네임 말줄임(...) 처리 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 90px; 
+  max-width: 90px;
+}
+
+.leader-item:first-child .leader-rank {
+  font-size: 18px;     /* 폰트 크기를 확 키움 (기존 12px) */
+  color: var(--accent); /* 색상도 파란색으로 강조 */
+  font-weight: 900;    /* 더 두껍게 */
+  /* 약간의 위치 조정이 필요할 경우 사용 (선택사항) */
+  /* transform: translateY(-1px); */
+}
+
+.leader-item:first-child .leader-name {
+   font-weight: 700;
+   font-size: 17px;
 }
 
 .leader-value { 
