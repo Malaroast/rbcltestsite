@@ -429,7 +429,7 @@ async function getRobloxAvatar(username) {
       const userId = data.data[0].id;
       
       // 2. 이미지 주소 생성
-      const imageUrl = `https://thumbnails.roblox.com/v1/users/avatar-bust??userId=${userId}&size=180x180&format=Png&isCircular=ture`;
+      const imageUrl = `https://thumbnails.roblox.com/v1/users/avatar-bust?userId=${userId}&size=180x180&format=Png&isCircular=ture`;
       // 최종 주소 생성
       const finalUrl = `${myProxy}?url=${encodeURIComponent(imageUrl)}`;
       
