@@ -16,9 +16,9 @@
       </div>
       <div class="controls">
         <div class="tabs" aria-label="카테고리 선택">
-          <button class="tab-btn active" data-tab="batters">타자 기록</button>
-          <button class="tab-btn" data-tab="pitchers">투수 기록</button>
           <button class="tab-btn active" data-tab="top5">Top 5 리더보드</button>
+          <button class="tab-btn" data-tab="batters">타자 기록</button>
+          <button class="tab-btn" data-tab="pitchers">투수 기록</button>
         </div>
         <label class="search" for="searchInput">
           <span>선수 검색</span>
@@ -46,7 +46,16 @@
           <button id="clearFilter" class="btn ghost">초기화</button>
         </div>
       </div>
-      <section id="batters" class="tab-content active">
+
+      <section id="top5" class="tab-content active">
+        <div class="section-head">
+          <h2>시즌 부문별 리더</h2>
+          <p>각 부문 상위 5명 기록입니다. 이름을 클릭하면 상세 정보를 확인합니다.</p>
+        </div>
+        <div id="leaderContainer" class="leader-grid"></div>
+      </section>
+
+      <section id="batters" class="tab-content">
         <div class="section-head">
           <h2>타자 기록</h2>
           <p>순위부터 타점까지 기본 스탯을 한눈에 확인하세요.</p>
@@ -91,20 +100,7 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <main>
-  <section id="top5" class="tab-content active"> <div class="section-head">
-      <h2>시즌 부문별 리더</h2>
-      <p>각 부문 상위 5명 기록입니다. 이름을 클릭하면 상세 정보를 확인합니다.</p>
-    </div>
-    <div class="leader-grid" id="leaderContainer"></div>
-  </section>
-  
-  <section id="batters" class="tab-content"> ... </section>
-  <section id="pitchers" class="tab-content"> ... </section>
-</main>
-
-  <script src="script.js"></script>
+  </div> <script src="script.js"></script>
 </body>
 </html>
