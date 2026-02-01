@@ -415,7 +415,7 @@ async function loadData() {
 async function getRobloxAvatar(username) {
   try {
     // 1. 유저네임으로 유저 정보(ID) 가져오기
-    const userRes = await fetch("https://users.roblox.com/v1/usernames/users", {
+    const userRes = await fetch("https://users.roproxy.com/v1/usernames/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
@@ -426,7 +426,7 @@ async function getRobloxAvatar(username) {
       const userId = userData.data[0].id;
 
       // 2. 유저 ID로 아바타 흉상(Bust) 이미지 가져오기
-      const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
+      const thumbRes = await fetch(`https://thumbnails.roproxy.com/v1/users/avatar-bust?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
       const thumbData = await thumbRes.json();
 
       if (thumbData.data && thumbData.data.length > 0) {
